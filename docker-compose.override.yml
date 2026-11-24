@@ -1,0 +1,32 @@
+# 本机改动（2026-10-22）：
+# 1) 改用 Dockerfile.local：apt 走本机代理 127.0.0.1:2080，npm 用 npmmirror
+#    原因：node:24-trixie-slim 缺 ca-certificates，且 apt 直连 deb.debian.org 超时
+# 2) 站点端口只绑回环，不把 3000 暴露到局域网
+# 起服务：docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+services:
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        NPM_REGISTRY: https://registry.npmmirror.com
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        NPM_REGISTRY: https://registry.npmmirror.com
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        NPM_REGISTRY: https://registry.npmmirror.com
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+      args:
+        NPM_REGISTRY: https://registry.npmmirror.com
+    ports:
+      - "127.0.0.1:3000:3000"
